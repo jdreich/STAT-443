@@ -1,0 +1,60 @@
+---
+title: "Reich HW 1 STAT 443"
+author: "J Reich"
+date: "January 19, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r warning = FALSE, message = FALSE}
+library(tseries)
+library(zoo)
+
+## Reading in the data
+Bradford <- read.csv("bradforddata.csv")
+```
+
+# Question 1. 
+### a) Read in the data and plot the time series:
+
+```{r}
+BradfordTS <- ts(data = Bradford$Max.Temp, start = c(1930,1), frequency = 12)
+
+plot(BradfordTS, xlab = "Date", ylab = "Max Temp (C)")
+```
+
+### Comment on the features of the data:
+
+Overall, the data appears nonstationary, since it exhibits periodicity (the expected value at any given time point is not the mean, but is rather related to some cyclic variation). The series has no obvious overall trend, and there does not seem to be a trend in the seasonal variation. That is, the seasonal variation looks approximately random (no overall increase or decrease in the magnitude over season). As a result, an additive model would be suitable for this data.
+
+### b) Create training and test data sets:
+
+```{r}
+training <- window(BradfordTS, 1950, c(2014,12))
+plot(training)
+```
+
+```{r}
+test <- window(BradfordTS, 2015, c(2017,12))
+plot(test)
+```
+
+As described previously, this model appears to follow additive model criteria, so no transformation is necessary. Deconstructing the test training set using both "decompose" and "stl" (loess smoothing) methods results in:
+
+```{r}
+training_decomp <- decompose(training, type="additive")
+plot(training_decomp)
+```
+
+```{r}
+training_stl <- stl(training, s.window="periodic")
+plot(training_stl)
+```
+
+### c. Creating a linear model to describe the trend component:
+
+
+
